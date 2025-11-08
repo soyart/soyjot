@@ -1,12 +1,10 @@
-pub mod clipboard;
-pub mod data;
 pub mod error;
 pub mod persist;
 pub mod persist_async;
 
 use tokio::sync::oneshot;
 
-use data::Data;
+use super::data::Data;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;

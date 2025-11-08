@@ -1,10 +1,11 @@
 use actix_web::{HttpResponse, HttpResponseBuilder};
 use serde_json::json;
 
+use soyjot::clipboard::{self};
+use soyjot::data::Data;
 use soyjot::html::{self, wrap_html};
-use soyjot::store::clipboard::{self};
-use soyjot::store::data::Data;
 use soyjot::store::error::{public_error, StoreError};
+use soyjot::{self};
 use soyjot::{para, tag_html};
 
 /// DropResult represents clipboard or error from http_server

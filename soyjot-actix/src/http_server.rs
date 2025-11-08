@@ -4,8 +4,8 @@ use actix_web::{web, HttpResponse};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
-use soyjot::store::clipboard::Clipboard;
-use soyjot::store::data::Data;
+use soyjot::clipboard::Clipboard;
+use soyjot::data::Data;
 use soyjot::store::error::StoreError;
 use soyjot::store::Store;
 

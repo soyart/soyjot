@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 use super::data::Data;
-use super::error::StoreError;
+use super::store::error::StoreError;
 
 pub const MEM: &str = "mem";
 pub const PERSIST: &str = "persist";
