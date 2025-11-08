@@ -30,6 +30,12 @@ impl Into<Clipboard> for ReqForm {
     }
 }
 
+impl Into<Data> for ReqForm {
+    fn into(self) -> Data {
+        self.data
+    }
+}
+
 async fn landing<R: http_resp::DropResponseHttp>() -> HttpResponse {
     R::landing_page()
 }
@@ -44,20 +50,16 @@ async fn add_clipboard<F, J, R>(
     req: web::Either<web::Form<F>, web::Json<J>>,
 ) -> HttpResponse
 where
-    F: Into<Clipboard>,
-    J: Into<Clipboard>,
+    F: Into<Data>,
+    J: Into<Data>,
     R: http_resp::DropResponseHttp,
 {
-    let clipboard = match req {
+    let clipboard: Data = match req {
         web::Either::Left(web::Form(form)) => form.into(),
         web::Either::Right(web::Json(json)) => json.into(),
     };
 
-    if let Err(err) = clipboard.is_implemented() {
-        return R::from((HttpResponse::BadRequest(), Err(err))).post_clipboard("");
-    }
-
-    if clipboard.is_empty() {
+    if clipboard.as_ref().is_empty() {
         return R::from((HttpResponse::BadRequest(), Err(StoreError::Empty))).post_clipboard("");
     }
 
@@ -66,7 +68,13 @@ where
     let mut hash = format!("{:x}", Sha256::digest(&clipboard));
     hash.truncate(4);
 
-    match Store::store_new_clipboard(store.into_inner(), &hash, clipboard, Duration::from(**dur)) {
+    match Store::store_new_clipboard(
+        store.into_inner(),
+        false, // TODO: parse from req and fix
+        &hash,
+        clipboard,
+        Duration::from(**dur),
+    ) {
         Ok(_) => R::from((HttpResponse::Ok(), Ok(None))).post_clipboard(&hash),
 
         Err(err) => {
@@ -107,10 +115,7 @@ where
         .route("", web::get().to(landing::<R>))
         .route("/", web::get().to(landing::<R>))
         .route("/drop/{id}", web::get().to(get_clipboard::<R>))
-        .route(
-            "/drop",
-            web::post().to(add_clipboard::<ReqForm, Clipboard, R>),
-        )
+        .route("/drop", web::post().to(add_clipboard::<ReqForm, Data, R>))
 }
 
 #[cfg(test)]

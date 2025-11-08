@@ -6,7 +6,6 @@ pub mod persist_async;
 
 use tokio::sync::oneshot;
 
-use clipboard::Clipboard;
 use data::Data;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -53,9 +52,9 @@ impl Store {
     /// and a the new clipboard with its own timer takes its place.
     pub fn store_new_clipboard(
         store: Arc<Self>,
+        persist: bool,
         hash: &str,
         clipboard: Data,
-        persist: bool,
         dur: Duration,
     ) -> Result<(), StoreError> {
         // Drop the old timer for the hash key
@@ -224,14 +223,14 @@ impl From<(Storage, oneshot::Sender<()>)> for Entry {
     }
 }
 
-impl From<Clipboard> for Storage {
-    fn from(clip: Clipboard) -> Self {
-        match clip {
-            Clipboard::Mem(data) => Self::Memory(data),
-            Clipboard::Persist(_) => Self::Persistent,
-        }
-    }
-}
+// impl From<Clipboard> for Storage {
+//     fn from(clip: Clipboard) -> Self {
+//         match clip {
+//             Clipboard::Mem(data) => Self::Memory(data),
+//             Clipboard::Persist(_) => Self::Persistent,
+//         }
+//     }
+// }
 
 // #[cfg(test)]
 // #[allow(dead_code)] // Bad tests - actix/tokio runtime conflict, will come back later

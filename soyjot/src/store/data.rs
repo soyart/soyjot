@@ -8,6 +8,19 @@ use serde::{
 #[derive(Clone, Deserialize)]
 pub struct Data(#[serde(deserialize_with = "string_or_bytes")] pub Vec<u8>);
 
+impl Data {
+    pub fn new() -> Self {
+        Self(Vec::new().into())
+    }
+}
+
+impl std::ops::Deref for Data {
+    type Target = [u8];
+    fn deref(self: &Self) -> &Self::Target {
+        self.0.as_ref()
+    }
+}
+
 impl AsRef<[u8]> for Data {
     fn as_ref(&self) -> &[u8] {
         &self.0
